@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DomainServices\CategoryService;
 use App\Http\Requests\Article\PreviewRequest;
 use App\Http\Requests\Article\StoreRequest;
 use App\Http\Requests\Article\ValidateUrlRequest;
@@ -16,45 +17,40 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 
+use App\DomainServices\ArticleService;
+use App\DomainServices\CommentService;
+
 class ArticleController extends Controller
 {
     /**
      * @param Request $request
+     * @param ArticleService $articleService
      * @return ViewFactory|View
      */
-    public function index(Request $request)
+    public function index(Request $request, ArticleService $articleService)
     {
         /** @var string $q */
         $q = $request->query('q');
-
         $searchQuery = addcslashes($q, '%_\\'); // 検索文字列をそのままの文字列として検索したいが、DBのエスケープ文字の場合そのまま渡すと正しく検索できないため、エスケープ文字の場合はバックスラッシュを付加して検索する
-        $articles = Article::with(['user', 'comments'])
-            ->where('title', 'like', "%{$searchQuery}%")
-            ->orWhere('description', 'like', "%{$searchQuery}%")
-            ->orWhereHas('comments', function ($query) use ($searchQuery) {
-                $query->where('body', 'like', "%{$searchQuery}%");
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $articles = $articleService->searchArticles($searchQuery);
 
         return view('article.index', compact('articles', 'q'));
     }
 
     /**
-     * @param Article $article
+     * @param string $article_id
+     * @param ArticleService $articleService
+     * @param CommentService $commentService
      * @return ViewFactory|View
      */
-    public function show(Article $article)
+    public function show(string $article_id, ArticleService $articleService, CommentService $commentService)
     {
-        $comments = $article->comments()
-                    ->orderBy('comments.updated_at', 'desc')
-                    ->paginate(20);
 
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        $ownComment = $article->getUserComment($loggedInUser);
+        $article = $articleService->find($article_id);
+        $comments = $commentService->getByArticleId($article_id);
+        $ownComment = $commentService->getBodyByUserId(Auth::id());
 
-        return view('article.show', compact('article', 'comments', 'loggedInUser', 'ownComment'));
+        return view('article.show', compact('article', 'comments', 'ownComment'));
     }
 
     /**
@@ -80,15 +76,16 @@ class ArticleController extends Controller
 
     /**
      * @param PreviewRequest $request
-     * @return ViewFactory|View
+     * @param CategoryService $categoryService
+     * @@return ViewFactory|View
      */
-    public function preview(PreviewRequest $request)
+    public function preview(PreviewRequest $request, CategoryService $categoryService)
     {
         /** @var string $url */
         $url = $request->query('url');
         $decodedUrl = urldecode($url);
         $ogp = (new Ogp($decodedUrl))();
-        $categories = Category::all();
+        $categories = $categoryService->all();
 
         return view('article.preview', [
             'url' => $decodedUrl,
@@ -101,20 +98,12 @@ class ArticleController extends Controller
 
     /**
      * @param StoreRequest $request
+     * @param ArticleService $articleService
      * @return RedirectResponse
      */
-    public function store(StoreRequest $request)
-    {
-        DB::transaction(function () use ($request) {
-            Article::create([
-                'user_id' => Auth::id(),
-                'category_id' => $request->input('categoryId'),
-                'url' => $request->input('url'),
-                'title' => $request->input('title'),
-                'description' => $request->input('description'),
-                'image_path' => $request->input('imagePath'),
-            ]);
-        });
+    public function store(StoreRequest $request, ArticleService $articleService) {
+
+        $articleService->store(Auth::id(), $request);
 
         $request->session()->flash('status', '記事を投稿しました');
 
