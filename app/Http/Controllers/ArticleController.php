@@ -43,12 +43,12 @@ class ArticleController extends Controller
      * @param CommentService $commentService
      * @return ViewFactory|View
      */
-    public function show(string $article_id, ArticleService $articleService, CommentService $commentService)
+    public function show(string $articleId, ArticleService $articleService, CommentService $commentService)
     {
 
-        $article = $articleService->find($article_id);
-        $comments = $commentService->getByArticleId($article_id);
-        $ownComment = $commentService->getBodyByUserId(Auth::id());
+        $article = $articleService->find($articleId);
+        $comments = $commentService->getArticleComments($articleId);
+        $ownComment = $commentService->getOwnComment($articleId, Auth::id());
 
         return view('article.show', compact('article', 'comments', 'ownComment'));
     }
@@ -103,7 +103,7 @@ class ArticleController extends Controller
      */
     public function store(StoreRequest $request, ArticleService $articleService) {
 
-        $articleService->store(Auth::id(), $request);
+        $articleService->create(Auth::id(), $request);
 
         $request->session()->flash('status', '記事を投稿しました');
 

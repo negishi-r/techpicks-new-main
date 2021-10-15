@@ -23,26 +23,32 @@ final class CommentService
     }
 
     /**
+     * 投稿コメントを取得
      * @param string $articleId
-     * @param int $limit
+     * @param int $perPage
      * @return LengthAwarePaginator
      */
-    public function getByArticleId(string $articleId, int $limit = 20): LengthAwarePaginator
+    public function getArticleComments(string $articleId, int $perPage = 20): LengthAwarePaginator
     {
         return $this->comment
             ->where('article_id', $articleId)
             ->orderBy('updated_at', 'desc')
-            ->paginate($limit);
+            ->paginate($perPage);
     }
 
     /**
+     * 自分の投稿コメントを取得
+     * @param string $articleId
      * @param string $userId
      * @return string|null
      */
-    public function getBodyByUserId(string $userId): ?string
+    public function getOwnComment(string $articleId, string $userId): ?string
     {
 
-        $comment = $this->comment->where('user_id', $userId)->first();
+        $comment = $this->comment->where([
+            ['article_id', $articleId],
+            ['user_id', $userId]
+        ])->first();
 
         if (! $comment) {
             return null;
@@ -52,19 +58,21 @@ final class CommentService
     }
 
     /**
-     * @param string $id
+     * 一件取得
+     * @param int $id
      * @return Comment
      */
-    public function find(string $id): Comment {
+    public function find(int $id): Comment {
         return $this->comment->find($id);
     }
 
     /**
+     * コメントをアップサート
      * @param string $userId
      * @param string $articleId
      * @param string $comment
      */
-    public function updateOrCreate(string $userId, string $articleId, string $comment): void {
+    public function upsert(string $userId, string $articleId, string $comment): void {
         $this->comment->updateOrCreate(
             ['user_id' => $userId, 'article_id' => $articleId],
             ['body' => $comment],

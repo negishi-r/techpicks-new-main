@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DomainServices;
 
 use App\Models\Category;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 final class CategoryService
 {
@@ -21,7 +21,11 @@ final class CategoryService
         $this->category = $category;
     }
 
-    public function all() {
+    /**
+     * 全件取得
+     * @return Collection
+     */
+    public function all(): Collection {
         return $this->category->all();
     }
 }

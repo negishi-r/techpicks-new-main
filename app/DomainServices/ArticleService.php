@@ -7,6 +7,7 @@ namespace App\DomainServices;
 use App\Http\Requests\Article\StoreRequest;
 use App\Models\Article;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 final class ArticleService
 {
@@ -23,29 +24,38 @@ final class ArticleService
     }
 
     /**
+     * 投稿の検索
      * @param string $searchQuery
+     * @param int $perPage
      * @return LengthAwarePaginator
      */
-    public function searchArticles(string $searchQuery): LengthAwarePaginator
+    public function searchArticles(string $searchQuery, int $perPage = 10): LengthAwarePaginator
     {
-        $articles = $this->article::with(['user', 'comments'])
+        return $this->article::with(['user', 'comments'])
             ->where('title', 'like', "%{$searchQuery}%")
             ->orWhere('description', 'like', "%{$searchQuery}%")
             ->orWhereHas('comments', function ($query) use ($searchQuery) {
                 $query->where('body', 'like', "%{$searchQuery}%");
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return $articles;
+            ->paginate($perPage);
     }
 
+    /**
+     * 一件取得
+     * @param string $id
+     * @return Article
+     */
     public function find(string $id): Article {
         return $this->article->find($id);
     }
 
-    public function store(string $userId, StoreRequest $request) {
-        Article::create([
+    /**
+     * @param string $userId
+     * @param StoreRequest $request
+     */
+    public function create(string $userId, StoreRequest $request) {
+        $this->article::create([
             'user_id' => $userId,
             'category_id' => $request->input('categoryId'),
             'url' => $request->input('url'),
@@ -53,5 +63,16 @@ final class ArticleService
             'description' => $request->input('description'),
             'image_path' => $request->input('imagePath'),
         ]);
+    }
+
+    /**
+     * aaa
+     * @param int $limt
+     * @return Collection
+     */
+    public function getRecentPosts(int $limt = 10): Collection {
+        return $this->article->orderBy('created_at', 'desc')
+            ->limit($limt)
+            ->get();
     }
 }

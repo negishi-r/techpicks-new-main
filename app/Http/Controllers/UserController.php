@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\DomainServices\UserService;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -40,17 +40,14 @@ class UserController extends Controller
 
     /**
      * @param UpdateRequest $request
-     * @param User $user
+     * @param string $userId
+     * @param UserService $userService
      * @return RedirectResponse
      */
-    public function update(UpdateRequest $request, User $user)
+    public function update(UpdateRequest $request, string $userId, UserService $userService): RedirectResponse
     {
-        DB::transaction(function () use ($request, $user) {
-            $user->update([
-                'name' => $request->input('name'),
-                'email' => $request->input('email'),
-            ]);
-        });
+        $userService->update($request->input('name'), $request->input('email'));
+        $user = $userService->find($userId);
 
         $request->session()->flash('status', 'プロフィールを更新しました');
 

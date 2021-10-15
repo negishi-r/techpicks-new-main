@@ -2,36 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\DomainServices\ArticleService;
+use App\DomainServices\CommentService;
 use App\Http\Requests\Comment\StoreOrUpdateRequest;
 use App\Models\User;
-use App\Models\Article;
-use App\Models\Comment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
     /**
      * @param StoreOrUpdateRequest $request
-     * @param Article $article
+     * @param string $articleId
+     * @param ArticleService $articleService
+     * @param CommentService $commentService
      * @return RedirectResponse
      */
-    public function storeOrUpdate(StoreOrUpdateRequest $request, Article $article)
+    public function storeOrUpdate(StoreOrUpdateRequest $request, string $articleId, ArticleService $articleService, CommentService $commentService)
     {
-        DB::transaction(function () use ($request, $article) {
-            Comment::updateOrCreate(
-                ['user_id' => Auth::id(), 'article_id' => $article->id],
-                ['body' => $request->input('comment')],
-            );
-        });
 
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        $ownComment = $article->getUserComment($loggedInUser);
+        $ownComment = $commentService->getOwnComment($articleId, Auth::id());
+
+        $commentService->upsert(Auth::id(), $articleId, $request->input('comment'));
+
         $flashMessage = $ownComment ? 'コメントを更新しました' : '記事にコメントしました';
-
         $request->session()->flash('status', $flashMessage);
+
+        $article = $articleService->find($articleId);
 
         return redirect()->route('article.show', compact('article'));
     }
