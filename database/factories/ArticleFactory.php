@@ -53,4 +53,18 @@ class ArticleFactory extends Factory
             ];
         });
     }
+
+    /**
+     * @param string $url
+     * @return ArticleFactory
+     */
+    public function url(string $url)
+    {
+        return $this->state(function () use ($url) {
+            return [
+                'url' => $url,
+            ];
+        });
+    }
+
 }
