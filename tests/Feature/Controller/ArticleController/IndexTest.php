@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\ArticleController;
+namespace Tests\Feature\Controller\ArticleController;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,29 +13,22 @@ class IndexTest extends TestCase
     use RefreshDatabase;
     use WithoutMiddleware;
 
-    private $user;
+    private User $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-//        $this->user = factory(User::class)->create();
-        $this->user = User::factory()->create([
-            'email_verified_at' => null,
-        ]);
+        $this->user = User::factory()->create();
 
     }
-
 
     public function test_getメソッドでアクセスできる()
     {
         $this->actingAs($this->user);
-        $response = $this->get('/article/index');
+        $response = $this->get('article/index');
 
         $response->assertStatus(200);
-//        $response = $this->get('/login');
-//
-//        $response->assertStatus(200);
 
     }
 
