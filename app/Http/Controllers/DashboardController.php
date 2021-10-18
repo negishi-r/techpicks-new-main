@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DomainServices\ArticleService;
+use App\UseCases\Dashboard\DashboardAction;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 
@@ -10,12 +11,12 @@ use Illuminate\Contracts\View\View;
 class DashboardController extends Controller
 {
     /**
-     * @param ArticleService $articleService
+     * @param DashboardAction $action
      * @return ViewFactory|View
      */
-    public function __invoke(ArticleService $articleService)
+    public function __invoke(DashboardAction $action): ViewFactory|View
     {
-        $articles = $articleService->getRecentPosts();
+        $articles = $action();
 
         return view('dashboard', compact('articles'));
     }

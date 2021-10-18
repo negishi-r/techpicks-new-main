@@ -11,16 +11,13 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class ArticleService
 {
-    /** @var Article */
-    private $article;
 
     /**
      * @param Article $article
      */
     public function __construct(
-        Article $article
+        private Article $article
     ) {
-        $this->article = $article;
     }
 
     /**

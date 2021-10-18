@@ -10,16 +10,12 @@ use function PHPUnit\Framework\returnArgument;
 
 final class CommentService
 {
-    /** @var Comment */
-    private $comment;
-
     /**
      * @param Comment $comment
      */
     public function __construct(
-        Comment $comment
+        private Comment $comment
     ) {
-        $this->comment = $comment;
     }
 
     /**

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\DomainServices\UserService;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
+use App\UseCases\User\UserShowAction;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -13,22 +15,20 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
-     * @param User $user
+     * @param string $userId
+     * @param UserShowAction $action
      * @return ViewFactory|View
      */
-    public function show(User $user)
+    public function show(string $userId, UserShowAction $action)
     {
-        /** @var User $loggedInUser */
-        $loggedInUser = Auth::user();
-        $canUpdate = $loggedInUser->can('update', $user);
-        $headerMessage = $canUpdate ? 'マイページ' : $user->name . 'さんのページ';
-
-        return view('user.show', compact('user', 'canUpdate', 'headerMessage'));
+        $data = $action($userId, Auth::id());
+        return view('user.show', $data);
     }
 
     /**
      * @param User $user
      * @return ViewFactory|View
+     * @throws AuthorizationException
      */
     public function edit(User $user)
     {
