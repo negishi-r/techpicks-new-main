@@ -51,6 +51,7 @@ final class ArticleService
     }
 
     /**
+     * 作成
      * @param string $userId
      * @param StoreRequest $request
      */
@@ -66,7 +67,7 @@ final class ArticleService
     }
 
     /**
-     * aaa
+     * 最近の投稿を取得
      * @param int $limt
      * @return Collection
      */
