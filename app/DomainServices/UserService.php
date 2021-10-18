@@ -8,24 +8,21 @@ use App\Models\User;
 
 final class UserService
 {
-    /** @var User */
-    private $user;
 
     /**
      * @param User $user
      */
     public function __construct(
-        User $user
-    ) {
-        $this->$user = $user;
-    }
+        private User $user
+    ) {}
 
     /**
      * 一件取得
      * @param int $id
      */
-    public function find(int $id) {
-        $this->user->find($id);
+    public function find(int $id)
+    {
+        return $this->user->find($id);
     }
 
     /**

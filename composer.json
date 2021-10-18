@@ -4,7 +4,7 @@
     "description": "Laravelによる追加開発を学習するためのサンプルアプリ",
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "8.0",
         "barryvdh/laravel-ide-helper": "^2.10",
         "davejamesmiller/laravel-breadcrumbs": "5.x",
         "embed/embed": "^4.3",

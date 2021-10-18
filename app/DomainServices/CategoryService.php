@@ -9,16 +9,13 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class CategoryService
 {
-    /** @var Category */
-    private $category;
 
     /**
      * @param Category $category
      */
     public function __construct(
-        Category $category
+        private Category $category
     ) {
-        $this->category = $category;
     }
 
     /**

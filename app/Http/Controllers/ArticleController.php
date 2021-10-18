@@ -2,61 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\DomainServices\CategoryService;
 use App\Http\Requests\Article\PreviewRequest;
 use App\Http\Requests\Article\StoreRequest;
 use App\Http\Requests\Article\ValidateUrlRequest;
-use App\Models\User;
-use App\Models\Article;
-use App\Models\Category;
+use App\UseCases\Article\ArticleIndexAction;
+use App\UseCases\Article\ArticlePreviewAction;
+use App\UseCases\Article\ArticleShowAction;
+use App\UseCases\Article\ArticleStoreAction;
 use App\Utils\Ogp;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
-
-use App\DomainServices\ArticleService;
-use App\DomainServices\CommentService;
 
 class ArticleController extends Controller
 {
     /**
      * @param Request $request
-     * @param ArticleService $articleService
+     * @param ArticleIndexAction $action
      * @return ViewFactory|View
      */
-    public function index(Request $request, ArticleService $articleService)
+    public function index(Request $request, ArticleIndexAction $action): ViewFactory|View
     {
         /** @var string $q */
         $q = $request->query('q');
         $searchQuery = addcslashes($q, '%_\\'); // 検索文字列をそのままの文字列として検索したいが、DBのエスケープ文字の場合そのまま渡すと正しく検索できないため、エスケープ文字の場合はバックスラッシュを付加して検索する
-        $articles = $articleService->searchArticles($searchQuery);
+
+        $articles = $action($searchQuery);
 
         return view('article.index', compact('articles', 'q'));
     }
 
     /**
-     * @param string $article_id
-     * @param ArticleService $articleService
-     * @param CommentService $commentService
+     * @param string $articleId
+     * @param ArticleShowAction $action
      * @return ViewFactory|View
      */
-    public function show(string $articleId, ArticleService $articleService, CommentService $commentService)
+    public function show(string $articleId, ArticleShowAction $action)
     {
 
-        $article = $articleService->find($articleId);
-        $comments = $commentService->getArticleComments($articleId);
-        $ownComment = $commentService->getOwnComment($articleId, Auth::id());
+        $data = $action($articleId, Auth::id());
 
-        return view('article.show', compact('article', 'comments', 'ownComment'));
+        return view('article.show', $data);
     }
 
     /**
      * @return ViewFactory|View
      */
-    public function create()
+    public function create(): ViewFactory|View
     {
         return view('article.create');
     }
@@ -65,7 +59,7 @@ class ArticleController extends Controller
      * @param ValidateUrlRequest $request
      * @return RedirectResponse
      */
-    public function validateUrl(ValidateUrlRequest $request)
+    public function validateUrl(ValidateUrlRequest $request): RedirectResponse
     {
         /** @var string $url */
         $url = $request->input('url');
@@ -76,16 +70,17 @@ class ArticleController extends Controller
 
     /**
      * @param PreviewRequest $request
-     * @param CategoryService $categoryService
-     * @@return ViewFactory|View
+     * @param ArticlePreviewAction $action
+     * @return ViewFactory|View
      */
-    public function preview(PreviewRequest $request, CategoryService $categoryService)
+    public function preview(PreviewRequest $request, ArticlePreviewAction $action): ViewFactory|View
     {
         /** @var string $url */
         $url = $request->query('url');
         $decodedUrl = urldecode($url);
         $ogp = (new Ogp($decodedUrl))();
-        $categories = $categoryService->all();
+
+        $categories = $action();
 
         return view('article.preview', [
             'url' => $decodedUrl,
@@ -98,12 +93,13 @@ class ArticleController extends Controller
 
     /**
      * @param StoreRequest $request
-     * @param ArticleService $articleService
+     * @param ArticleStoreAction $action
      * @return RedirectResponse
      */
-    public function store(StoreRequest $request, ArticleService $articleService) {
+    public function store(StoreRequest $request, ArticleStoreAction $action): RedirectResponse
+    {
 
-        $articleService->create(Auth::id(), $request);
+        $action(Auth::id(), $request);
 
         $request->session()->flash('status', '記事を投稿しました');
 
