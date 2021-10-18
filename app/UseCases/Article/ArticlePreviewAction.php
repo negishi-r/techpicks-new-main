@@ -2,7 +2,7 @@
 
 namespace App\UseCases\Article;
 
-use App\DomainServices\CategoryService;
+use App\Services\CategoryService;
 use Illuminate\Database\Eloquent\Collection;
 
 class ArticlePreviewAction

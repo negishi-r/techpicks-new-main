@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DomainServices;
+namespace App\Services;
 
 use App\Http\Requests\Article\StoreRequest;
 use App\Models\Article;

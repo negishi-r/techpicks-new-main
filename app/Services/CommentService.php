@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DomainServices;
+namespace App\Services;
 
 use App\Models\Comment;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

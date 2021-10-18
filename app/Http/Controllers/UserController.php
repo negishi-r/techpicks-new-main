@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\DomainServices\UserService;
+use App\Services\UserService;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use App\UseCases\User\UserShowAction;
+use App\UseCases\User\UserUpdateAction;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
@@ -44,10 +45,9 @@ class UserController extends Controller
      * @param UserService $userService
      * @return RedirectResponse
      */
-    public function update(UpdateRequest $request, string $userId, UserService $userService): RedirectResponse
+    public function update(UpdateRequest $request, string $userId, UserUpdateAction $action): RedirectResponse
     {
-        $userService->update($request->input('name'), $request->input('email'));
-        $user = $userService->find($userId);
+        $user = $action($userId, $request->input('name'), $request->input('email'));
 
         $request->session()->flash('status', 'プロフィールを更新しました');
 

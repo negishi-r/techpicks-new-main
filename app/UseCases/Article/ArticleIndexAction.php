@@ -2,7 +2,7 @@
 
 namespace App\UseCases\Article;
 
-use App\DomainServices\ArticleService;
+use App\Services\ArticleService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ArticleIndexAction

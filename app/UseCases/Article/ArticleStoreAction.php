@@ -2,7 +2,7 @@
 
 namespace App\UseCases\Article;
 
-use App\DomainServices\ArticleService;
+use App\Services\ArticleService;
 use App\Http\Requests\Article\StoreRequest;
 
 class ArticleStoreAction

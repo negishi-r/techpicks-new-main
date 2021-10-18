@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DomainServices\ArticleService;
 use App\UseCases\Dashboard\DashboardAction;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;

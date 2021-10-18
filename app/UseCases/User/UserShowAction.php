@@ -2,7 +2,7 @@
 
 namespace App\UseCases\User;
 
-use App\DomainServices\UserService;
+use App\Services\UserService;
 
 class UserShowAction
 {

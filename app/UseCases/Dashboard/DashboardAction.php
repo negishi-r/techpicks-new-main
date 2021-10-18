@@ -2,7 +2,7 @@
 
 namespace App\UseCases\Dashboard;
 
-use App\DomainServices\ArticleService;
+use App\Services\ArticleService;
 use \Illuminate\Database\Eloquent\Collection;
 
 class DashboardAction

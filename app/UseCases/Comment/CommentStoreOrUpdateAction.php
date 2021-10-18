@@ -2,8 +2,8 @@
 
 namespace App\UseCases\Comment;
 
-use App\DomainServices\ArticleService;
-use App\DomainServices\CommentService;
+use App\Services\ArticleService;
+use App\Services\CommentService;
 use App\Http\Requests\Article\StoreRequest;
 use Illuminate\Support\Facades\Auth;
 
