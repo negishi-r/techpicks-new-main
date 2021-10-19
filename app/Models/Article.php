@@ -54,22 +54,4 @@ class Article extends Model
         return $this->image_path ?? '/image/noimage.png';
     }
 
-    /**
-     * 対象記事に対する対象ユーザのコメント取得
-     *
-     * @param User|null $user
-     * @return string|null
-     */
-    public function getUserComment(?User $user): ?string
-    {
-        if (! $user) {
-            return null;
-        }
-
-        $comment = $this->comments()->where('user_id', $user->id)->first();
-        if (! $comment) {
-            return null;
-        }
-        return $comment->body;
-    }
 }
