@@ -12,12 +12,11 @@ class ArticleStoreAction
     ){}
 
     /**
-     * @param string $userId
-     * @param StoreRequest $request
+     * @param array $array
      */
-    public function __invoke(string $userId, StoreRequest $request): void
+    public function __invoke(array $array): void
     {
-        $this->articleService->create($userId, $request);
+        $this->articleService->create($array);
     }
 
 }

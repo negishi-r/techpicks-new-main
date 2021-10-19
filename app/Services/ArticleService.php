@@ -49,18 +49,10 @@ final class ArticleService
 
     /**
      * 作成
-     * @param string $userId
-     * @param StoreRequest $request
+     * @param array $array
      */
-    public function create(string $userId, StoreRequest $request) {
-        $this->article::create([
-            'user_id' => $userId,
-            'category_id' => $request->input('categoryId'),
-            'url' => $request->input('url'),
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'image_path' => $request->input('imagePath'),
-        ]);
+    public function create(array $array) {
+        $this->article::create($array);
     }
 
     /**

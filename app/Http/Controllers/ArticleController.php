@@ -99,7 +99,14 @@ class ArticleController extends Controller
     public function store(StoreRequest $request, ArticleStoreAction $action): RedirectResponse
     {
 
-        $action(Auth::id(), $request);
+        $action([
+            'user_id' => Auth::id(),
+            'category_id' => $request->input('categoryId'),
+            'url' => $request->input('url'),
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'image_path' => $request->input('imagePath'),
+        ]);
 
         $request->session()->flash('status', '記事を投稿しました');
 
